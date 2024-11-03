@@ -13,10 +13,6 @@ services:
         value: 10000  # Render will provide the actual port in an environment variable
     healthCheckPath: "/health"  # Adjust according to your app's health check endpoint
     autoDeploy: true
-    disk:
-      name: persistent_storage
-      mountPath: /data
-      sizeGB: 1
 
   # Background worker configuration (if needed)
   - type: worker
