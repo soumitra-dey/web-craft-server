@@ -3,37 +3,25 @@ services:
   - type: web
     name: web-craft-server
     env: node
-    plan: free  # Adjust to 'starter' or 'standard' if you need more resources
+    plan: free
     buildCommand: "npm install"
-    startCommand: "node index.js"  # Update to your app's start command if different
+    startCommand: "node index.js"
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000  # Render will provide the actual port in an environment variable
-
-    # Optional: health check configuration
     healthCheckPath: "/health"  # Adjust according to your app's health check endpoint
-
-    # Optional: auto deploy on Git commits to the specified branch
     autoDeploy: true
-
-    # Optional: set up disk storage (if your app needs persistent storage)
     disk:
       - name: persistent_storage
-        mountPath: /data  # Adjust the path if needed
-        sizeGB: 1  # Size in GB; minimum is 1GB
+        mountPath: /data
+        sizeGB: 1
 
-    # Optional: specify build and start commands based on project structure
-    build:
-      - run: npm run build  # If your project has a build step (e.g., for TypeScript)
-    start:
-      - run: node index.js  # Ensure start command matches your package.json setup
-
-# Optional: background worker configuration (if you need worker processes)
+# Optional: background worker configuration (if needed)
 jobs:
   - type: worker
-    name: web-craft-server
+    name: web-craft-worker
     env: node
     buildCommand: "npm install"
-    startCommand: "node index.js"  # Replace with your worker's start command
+    startCommand: "node index.js"  # Replace with your worker's entry point if different
