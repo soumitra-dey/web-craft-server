@@ -15,17 +15,9 @@ app.use(cors({
 
 app.use('/api/gpt', gpt);
 
-
-
-
-
-
-
-
-
-
-
-
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+});
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true }).then(() => {
     console.log('Connected to database');
@@ -34,5 +26,5 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true }).then(() => {
 });
 
 app.listen(8080, () => {
-    console.log('Example app listening on port 8080!');
+    console.log('App listening on port 8080!');
 });
