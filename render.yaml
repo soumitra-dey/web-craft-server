@@ -14,12 +14,11 @@ services:
     healthCheckPath: "/health"  # Adjust according to your app's health check endpoint
     autoDeploy: true
     disk:
-      - name: persistent_storage
-        mountPath: /data
-        sizeGB: 1
+      name: persistent_storage
+      mountPath: /data
+      sizeGB: 1
 
-# Optional: background worker configuration (if needed)
-jobs:
+  # Background worker configuration (if needed)
   - type: worker
     name: web-craft-worker
     env: node
