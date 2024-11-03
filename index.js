@@ -33,6 +33,6 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true }).then(() => {
     console.log('Not connected to database ERROR! ', err);
 });
 
-app.listen(8000, () => {
-    console.log('Example app listening on port 8000!');
+app.listen(8080, () => {
+    console.log('Example app listening on port 8080!');
 });
