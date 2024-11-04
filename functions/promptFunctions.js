@@ -1,6 +1,7 @@
 const axios = require("axios");
 const Prompt = require("../model/prompt");
 require('dotenv').config();
+const { decode } = require('html-entities');
 
 
 const openAIHeaders = {
@@ -101,13 +102,21 @@ class PromptFunctions {
             let code = response.data.choices[0].message.content;
 
             code = code.replace("```jsx\n", '');
-            code = code.replace("```\n", '');
+            code = code.replace("```", '');
 
             let rectiFyCode = this.#reviewAndFixCode(code);
 
+            const oldCode = await Prompt.findById(promptId);
+
+            let formatTargetCode = this.#splitHtmlString(targetedCode);
+
+            let updateCode = this.#updateCode(oldCode.response, rectiFyCode, formatTargetCode);
+
+            let updatedCode = await Prompt.findByIdAndUpdate(promptId, { response: updateCode }, { new: true });
+
             return {
                 status: 200,
-                json: response.data.choices[0].message.content
+                json: updatedCode
             };
         } catch (error) {
             console.log(error);
@@ -151,6 +160,45 @@ class PromptFunctions {
         });
     
         return code;
+    }
+
+    #splitHtmlString(htmlString) {
+        const addClassName = htmlString.replace(/class=/g, 'className=');
+        const decodedHtml = decode(addClassName);
+        const selfClosingTags = [
+            'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 
+            'img', 'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'
+        ];
+        const regex = new RegExp(`(<(${selfClosingTags.join('|')})[^>]*)(?<!/)>`, 'gi');
+        const replacedText = decodedHtml.replace(regex, '$1/>')
+        const splitArray = replacedText.split('><');
+        return splitArray.length > 1 ? splitArray.map((str, index) => {
+            if (index === 0) {
+                return str + '>';
+            } else if (index === splitArray.length - 1) {
+                return `<${str}`;
+            } else {
+                return `<${str}>`;
+            }
+        }) : splitArray;
+    }
+
+    #updateCode(oldCode, newCode, targetedCode) {
+        let target = ""
+        let trimmedCode = oldCode.split("\n");
+        let fl = 0
+        for (let i = 0; i < trimmedCode.length; i++) {
+            if (trimmedCode[i].trim() == targetedCode[fl]) {
+                target += trimmedCode[i]
+                fl++
+            }
+            if (fl >= targetedCode.length) {
+                break;
+            }
+        }
+
+        let updatedCode = oldCode.replace(target, newCode)
+        return updatedCode
     }
     
 }

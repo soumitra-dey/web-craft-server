@@ -21,8 +21,9 @@ router.post('/generate', async(req, res) => {
 router.post('/edit', async(req, res) => {
     try {
         let response = await promptFunctions.editCode({
-            code: req.body.code,
-            prompt: req.body.prompt
+            targetedCode: req.body.code,
+            prompt: req.body.prompt,
+            promptId: req.body.promptId
         });
         res.status(response.status).send(response.json);
     } catch (error) {
